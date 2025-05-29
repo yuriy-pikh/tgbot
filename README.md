@@ -1,43 +1,87 @@
-# Мій Telegram Бот на Go
+# My Telegram Bot in Go
 
-Це простий Telegram-бот, написаний на Go, який використовує бібліотеки `telebot` та `cobra`.
+This is a simple Telegram bot written in Go, using the `telebot` and `cobra` libraries. It is built using a Makefile for task automation and Docker for containerization.
 
-## Функціонал
+## Features
 
-Цей бот має наступні команди:
+This bot has the following commands:
 
-* `/start` - Привітає вас і почне діалог.
-* `/help` - Покаже список усіх доступних команд та їх опис.
-* `/echo <текст>` - Бот повторить будь-який текст, який ви йому відправите після цієї команди.
-* `/wordcount <текст>` - Бот порахує кількість слів у наданому тексті.
+* `/start` - Greets you and starts the conversation.
+* `/help` - Shows a list of all available commands and their descriptions.
+* `/echo <text>` - The bot will repeat any text you send after this command.
+* `/wordcount <text>` - The bot will count the number of words in the provided text.
+* `version` (CLI command) - Shows the program version.
 
-## Встановлення та запуск
+## Installation and Startup
 
-1.  **Клонуйте репозиторій:**
+1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/ВАШ_КОРИСТУВАЧ/ВАШ_РЕПОЗИТОРІЙ.git](https://github.com/ВАШ_КОРИСТУВАЧ/ВАШ_РЕПОЗИТОРІЙ.git)
-    cd ВАШ_РЕПОЗИТОРІЙ
+    git clone https://github.com/yuriy-pikh/tgbot.git # Or the URL of your fork
+    cd tgbot
     ```
-2.  **Отримайте токен бота:**
-    Створіть свого бота через BotFather у Telegram і отримайте його токен.
-3.  **Встановіть змінну середовища `TELE_TOKEN`:**
+2.  **Get a bot token:**
+    Create your bot via BotFather in Telegram and get its token.
+3.  **Set the `TELE_TOKEN` environment variable:**
+    It's best to set this variable for the current terminal session before running the bot. To avoid saving the token in your command history, use:
     ```bash
-    export TELE_TOKEN="ВАШ_ТОКЕН_БОТА"
+    read -s -p "Enter your TELE_TOKEN: " TELE_TOKEN
+    export TELE_TOKEN
     ```
-    *Примітка: Для постійного збереження змінної середовища додайте її до вашого файлу `.bashrc`, `.zshrc` або `.profile`.*
-4.  **Запустіть бота:**
-    ```bash
-    go run main.go tgbot
-    # Або, якщо ви зібрали бінарник:
-    # ./ВАШ_БІНАРНИК_ІМ'Я tgbot
-    ```
+    *Note: This method sets the variable only for the current session. For permanent storage, you can add `export TELE_TOKEN="YOUR_BOT_TOKEN"` to your shell's configuration file (e.g., `.bashrc`, `.zshrc`), but this is less secure.*
 
-## Перевірка бота
+4.  **Build and Run:**
 
-Знайдіть свого бота в Telegram (наприклад, t.me/ВАШ_ІМ'Я_БОТА_bot) та спробуйте наступні команди:
+    *   **Local launch (using Go):**
+        This method is suitable for development and quick tests.
+        ```bash
+        go run main.go tgbot
+        # or `go run main.go start`
+        ```
+
+    *   **Local launch (using Makefile for building):**
+        The Makefile automates the process of building the binary file.
+        ```bash
+        make build
+        ./tgbot start
+        ```
+
+    *   **Running with Docker:**
+        This method uses Docker to create and run a containerized version of the bot.
+
+        1.  **Build the Docker image:**
+            The Makefile will determine the version based on Git tags and commit hash.
+            ```bash
+            make image
+            ```
+            This will create an image with a tag like `urapikh/tgbot:0.1.0-a1b2c3d-amd64` or `urapikh/tgbot:a1b2c3d-amd64` (if there are no Git tags). You will see the exact tag in the output of the `make image` command.
+
+        2.  **Run the container:**
+            Use the tag obtained in the previous step.
+            ```bash
+            # Replace <image-tag> with the actual tag of your image (e.g., urapikh/tgbot:0.1.0-a1b2c3d-amd64)
+            docker run -d -e TELE_TOKEN=$TELE_TOKEN --name my-telegram-bot <image-tag>
+            ```
+            For example:
+            ```bash
+            docker run -d -e TELE_TOKEN=$TELE_TOKEN --name my-telegram-bot urapikh/tgbot:a1b2c3d-amd64
+            ```
+
+## Testing the Bot
+
+Find your bot on Telegram (e.g., t.me/YOUR_BOT_NAME_bot) and try the following commands:
 
 * `/start`
 * `/help`
-* `/echo Привіт, бот!`
-* `/wordcount Скільки тут слів?`
-* Напишіть будь-який довільний текст, щоб побачити, як бот реагує на невідомі команди або звичайні повідомлення.
+* `/echo Hello, bot!`
+* `/wordcount How many words are here?`
+* Write any arbitrary text to see how the bot reacts to unknown commands or regular messages.
+
+## Makefile Commands
+
+* `make build`: Builds the application binary.
+* `make image`: Builds the Docker image.
+* `make push`: (If Docker Hub is configured) Pushes the image to the registry.
+* `make clean`: Removes the built binary.
+* `make format`: Formats the code.
+* `make lint`: Runs the linter.
+* `make test`: Runs tests.
