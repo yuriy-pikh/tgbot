@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+tgbot # Твій існуючий бінарник в корені
+app
+*.exe
+*.out
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+vendor/
+
+.DS_Store
+Thumbs.db
+
+.env
+*.env
+
+*_test.go
+
+README.md
+LICENSE
