@@ -10,7 +10,7 @@ APP_VERSION_VAR_PATH := ${APP}/cmd.appVersion
 
 BINARY_NAME := tgbot
 MAIN_GO_FILE := ./main.go
-REGISTRY := yuriy-pikh/urapikh
+REGISTRY := ghcr.io/yuriy-pikh
 
 LDFLAGS         := -s -w -X '${APP_VERSION_VAR_PATH}=${VERSION}'
 
