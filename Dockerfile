@@ -1,7 +1,8 @@
 FROM --platform=$BUILDPLATFORM quay.io/projectquay/golang:1.21 AS builder
 
 WORKDIR /go/src/app
-RUN apk add --no-cache make
+RUN apt-get update && apt-get install -y make \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
