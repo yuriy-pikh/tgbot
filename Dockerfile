@@ -1,4 +1,4 @@
-FROM golang:1.24.3-alpine AS builder
+FROM --platform=$BUILDPLATFORM quay.io/projectquay/golang:1.21 AS builder
 
 WORKDIR /go/src/app
 RUN apk add --no-cache make

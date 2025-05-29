@@ -2,15 +2,15 @@ GIT_TAG_VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null)
 GIT_COMMIT_HASH := $(shell git rev-parse --short HEAD)
 VERSION         := $(if $(GIT_TAG_VERSION),$(GIT_TAG_VERSION)-$(GIT_COMMIT_HASH),$(GIT_COMMIT_HASH))
 
-TARGETOS := linux
-TARGETARCH := amd64
+TARGETOS ?= linux
+TARGETARCH ?= amd64
 
-MODULE_NAME     := tgbot
-APP_VERSION_VAR_PATH := ${MODULE_NAME}/cmd.appVersion
+APP := $(shell basename -s .git $(shell git remote get-url origin))
+APP_VERSION_VAR_PATH := ${APP}/cmd.appVersion
 
 BINARY_NAME := tgbot
 MAIN_GO_FILE := ./main.go
-REGISTRY := urapikh
+REGISTRY := ghcr.io/urapikh
 
 LDFLAGS         := -s -w -X '${APP_VERSION_VAR_PATH}=${VERSION}'
 
@@ -45,13 +45,26 @@ build: format get build-only
 
 image:
 	@echo ">>> Building Docker image..."
-	@docker build --platform linux/${TARGETARCH} . -t ${REGISTRY}/${MODULE_NAME}:${VERSION}-${TARGETARCH}
+	@docker build --platform linux/${TARGETARCH} . -t ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
 
 push:
-	@echo ">>> Pushing Docker image ${REGISTRY}/${MODULE_NAME}:${VERSION}-${TARGETARCH}..."
-	@docker push ${REGISTRY}/${MODULE_NAME}:${VERSION}-${TARGETARCH}
+	@echo ">>> Pushing Docker image ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}..."
+	@docker push ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH}
+
+linux:
+	$(MAKE) TARGETOS=linux TARGETARCH=amd64 image
+
+arm:
+	$(MAKE) TARGETOS=linux TARGETARCH=arm64 image
+
+macos:
+	$(MAKE) TARGETOS=darwin TARGETARCH=arm64 image
+
+windows:
+	$(MAKE) TARGETOS=windows TARGETARCH=amd64 image
 
 clean:
 	@echo ">>> Cleaning up..."
 	@rm -f ${BINARY_NAME}
+	@docker rmi -f ${REGISTRY}/${APP}:${VERSION}-${TARGETARCH} || true
 	@go clean
